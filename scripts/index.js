@@ -15,6 +15,7 @@ export default class CanvasParallaxController {
     this.settings = {
       throttle: 100,
       depth: 50,
+      preload: true,
     }
 
     // Object assign the user settings
@@ -62,6 +63,7 @@ export default class CanvasParallaxController {
       active: false,
       loaded: false,
       depth: this.settings.depth,
+      initialized: false,
       view: {
         top: 0,
         bottom: 0,
@@ -149,19 +151,23 @@ export default class CanvasParallaxController {
   getScrollPercentages() {
     this.calculations = {};
 
-    const from = this.canvas.pageYOffset - window.innerHeight;
-    const to = from + this.canvas.element.clientHeight + window.innerHeight;
+    if (this.status.initialized || this.settings.preload) {
+      const from = this.canvas.pageYOffset - window.innerHeight;
+      const to = from + this.canvas.element.clientHeight + window.innerHeight;
 
-    for (let index = from; index < to; index++) {
-      this.calculations[index] = this.calculateScrollPercent(index);
+      for (let index = from; index < to; index++) {
+        this.calculations[index] = this.calculateScrollPercent(index);
 
-      // Make sure the image is loaded
-      if (this.image) {
-        this.image.parallax(this.calculations[index], {
-          width: this.canvas.element.clientWidth,
-          height: this.canvas.element.clientHeight,
-        });
+        // Make sure the image is loaded
+        if (this.image) {
+          this.image.parallax(this.calculations[index], {
+            width: this.canvas.element.clientWidth,
+            height: this.canvas.element.clientHeight,
+          });
+        }
       }
+
+      this.status.initialized = true;
     }
   }
 
