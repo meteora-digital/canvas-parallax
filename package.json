@@ -1,6 +1,6 @@
 {
   "name": "canvas-parallax",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A class to create a canvas element to hold a parallax background image and avoid CLS",
   "main": "dist/index.js",
   "scripts": {
