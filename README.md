@@ -38,7 +38,7 @@ const CanvasParallax = new CanvasParallaxController({
 banner.appendChild(Carallax.canvas.element);
 ```
 
-#### We can either load SVGs from the DOM
+#### We can load image src URLs from the DOM
 ```es6
 // The"50% 50%" is the main focus point of the image, it can be set to 0% 0% for top left hand corner or 100% 100% for bottom right hand corner etc.
 Carallax.load(image.src, "50% 50%");
