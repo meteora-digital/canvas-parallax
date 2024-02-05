@@ -5,7 +5,7 @@ This class will create a canvas element to draw a parallax background image
 ## Installation
 
 ```bash
-npm i carallax
+npm i canvas-parallax
 ```
 
 ## Usage
