@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/meteora-digital/tween.git"
+    "url": "git+https://github.com/meteora-digital/canvas-parallax.git"
   },
   "keywords": [
     "JavaScript",
@@ -21,7 +21,7 @@
   "author": "Emmanuel Davies",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/meteora-digital/tween/issues"
+    "url": "https://github.com/meteora-digital/canvas-parallax"
   },
   "devDependencies": {
     "@babel/core": "^7.23.7",
@@ -31,5 +31,5 @@
     "webpack-cli": "^5.1.4",
     "worker-loader": "^3.0.8"
   },
-  "homepage": "https://github.com/meteora-digital/tween#readme"
+  "homepage": "https://github.com/meteora-digital/canvas-parallax#readme"
 }
