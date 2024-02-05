@@ -94,7 +94,7 @@ export default class CanvasParallaxController {
       // Add this layer to the layers object
       this.image = new ParallaxImageController(image, {
         focus: focus,
-        depth: this.status.depth,
+        depth: this.settings.depth,
         dpr: this.settings.dpr,
       });
       // Now we need to update some things
@@ -233,8 +233,6 @@ export default class CanvasParallaxController {
       this.canvas.resize(this.canvas.element.clientWidth, this.canvas.element.clientHeight);
       // Tell the buffer to resize
       this.buffer.resize(this.canvas.element.clientWidth, this.canvas.element.clientHeight);
-
-      this.status.depth = ((this.canvas.element.clientWidth / Math.log(this.canvas.element.clientWidth)) / 100) * (this.settings.depth * this.canvas.dpr);
 
       // Loop through the layers and resize them too, they only need the width of the canvas as their height is calculated
       if (this.image) {
