@@ -1,4 +1,4 @@
-# Carallax
+# Canvas Parallax
 
 This class will create a canvas element to draw a parallax background image
 
