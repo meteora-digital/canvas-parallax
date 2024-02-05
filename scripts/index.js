@@ -15,7 +15,6 @@ export default class CanvasParallaxController {
     this.settings = {
       throttle: 100,
       depth: 50,
-      dpr: window.devicePixelRatio || 1,
     }
 
     // Object assign the user settings
@@ -24,9 +23,9 @@ export default class CanvasParallaxController {
     }
 
     // Create a new buffer canvas
-    this.canvas = new CanvasController(this.settings.dpr);
+    this.canvas = new CanvasController();
     // Create a new buffer canvas
-    this.buffer = new CanvasController(this.settings.dpr);
+    this.buffer = new CanvasController();
     // The current image
     this.image = null;
     // Some timeouts
@@ -95,7 +94,6 @@ export default class CanvasParallaxController {
       this.image = new ParallaxImageController(image, {
         focus: focus,
         depth: this.settings.depth,
-        dpr: this.settings.dpr,
       });
       // Now we need to update some things
       this.resize();
@@ -264,7 +262,7 @@ class ParallaxImageController {
     // The focus position of the image
     this.focus = settings.focus || '50% 50%';
     // Create a new buffer canvas
-    this.canvas = new CanvasController(settings.dpr);
+    this.canvas = new CanvasController();
     // The pixel height of the layer
     this.height = 0;
     // The pixel width of the layer
@@ -384,9 +382,9 @@ class ParallaxImageController {
     this.canvas.resize(canvasWidth, canvasHeight);
 
     // Work out the pixel height of the layer
-    this.height = this.canvas.element.height * (1 / this.canvas.dpr);
+    this.height = this.canvas.element.height;
     // Work out the pixel width of the layer
-    this.width = this.canvas.element.width * (1 / this.canvas.dpr);
+    this.width = this.canvas.element.width;
 
     // After we have resized the image, we want to update the canvas
     this.draw();
@@ -401,13 +399,11 @@ class ParallaxImageController {
    ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝  ╚═══╝  ╚═╝  ╚═╝╚══════╝ */
 
 class CanvasController {
-  constructor(dpr) {
+  constructor() {
     // Create a new canvasController element
     this.element = document.createElement('canvas');
     // The canvas context
     this.ctx = this.element.getContext('2d');
-    // The devicePixelRatio
-    this.dpr = dpr || window.devicePixelRatio || 1;
     // The page offset
     this.pageYOffset = 0;
   }
@@ -422,8 +418,8 @@ class CanvasController {
       element = element.offsetParent;
     }
 
-    this.element.width = width * this.dpr;
-    this.element.height = height * this.dpr;
+    this.element.width = width;
+    this.element.height = height;
     // Update the pageYOffset of the canvas
     this.pageYOffset = offset;
   }
