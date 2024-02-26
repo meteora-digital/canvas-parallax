@@ -52,9 +52,10 @@ CanvasParallax.load(image.src, "50% 50%");
 
 | Option | Type | Description | Default |
 |--------|------|-------------|---------|
+| `alpha` | `boolean` | Whether or not the canvas needs to be cleared between each render. | `false` |
 | `depth` | `number` | The depth of the parallax effect. | `50` |
-| `throttle` | `number` | The resize calculations throttle time in milliseconds. | `100` |
 | `preload ` | `boolean` | Whether or not the class will pre-calculate all the positions of the parallax | `true` |
+| `throttle` | `number` | The resize calculations throttle time in milliseconds. | `100` |
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)

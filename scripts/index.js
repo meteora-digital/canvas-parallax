@@ -13,9 +13,10 @@ export default class CanvasParallaxController {
   constructor(options = {}) {
     // The parallax settings
     this.settings = {
-      throttle: 100,
+      alpha: false,
       depth: 50,
       preload: true,
+      throttle: 100,
     }
 
     // Object assign the user settings
@@ -188,10 +189,16 @@ export default class CanvasParallaxController {
     if (!this.image) return;
 
     if (window.scrollY + window.innerHeight > this.status.view.top && window.scrollY < this.status.view.bottom) {
-      // Clear the buffer canvas
-      this.buffer.ctx.clearRect(0, 0, this.buffer.element.width, this.buffer.element.height);
-
+      // Get the scroll percentage
       const percentScrolled = this.getScrollPercent();
+
+      // Clear the canvas if alpha is enabled
+      if (this.settings.alpha) {
+        // Clear the buffer canvas
+        this.buffer.ctx.clearRect(0, 0, this.buffer.element.width, this.buffer.element.height);
+        // Draw the buffer image to the canvas
+        this.canvas.ctx.clearRect(0, 0, this.canvas.element.width, this.canvas.element.height);
+      }
 
       // Draw the image to the buffer canvas;
       try {
@@ -203,8 +210,6 @@ export default class CanvasParallaxController {
         this.buffer.ctx.drawImage(this.image.canvas.element, position.x, position.y);
       } catch (e) { }
 
-      // Draw the buffer image to the canvas
-      this.canvas.ctx.clearRect(0, 0, this.canvas.element.width, this.canvas.element.height);
       try {
         this.canvas.ctx.drawImage(this.buffer.element, 0, 0);
       } catch (e) { }
@@ -299,31 +304,6 @@ class ParallaxImageController {
     // Draw the image on the canvas at the appropriate size
     this.canvas.ctx.drawImage(this.image, 0, 0, this.canvas.element.width, this.canvas.element.height);
   }
-
-  // parallax(percentage = 0, viewport = {}) {
-  //   if (!this.calculations[percentage]) {
-  //     // Calculate the y offset
-  //     let offset = this.depth * (percentage / 100);
-
-  //     // Get the center of the viewport
-  //     let center = {
-  //       x: (viewport.width - this.width) / 2,
-  //       y: (viewport.height - this.height) / 2,
-  //     };
-
-  //     // Calculate the new position
-  //     let position = {
-  //       x: center.x,
-  //       y: center.y + offset,
-  //     }
-
-  //     // Store the calculation
-  //     this.calculations[percentage] = position;
-  //   }
-
-  //   // Return the calculation
-  //   return this.calculations[percentage];
-  // }
 
   parallax(percentage = 0, viewport = {}) {
     if (!this.calculations[percentage]) {
