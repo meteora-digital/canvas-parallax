@@ -102,6 +102,8 @@ export default class CanvasParallaxController {
       this.resize();
       // Enable drawing
       this.enable();
+      // Draw the image
+      this.draw();
 
       clearTimeout(this.timeouts['loaded']);
       this.timeouts['loaded'] = setTimeout(() => {
@@ -114,7 +116,7 @@ export default class CanvasParallaxController {
     };
 
     // If the image is already loaded, call the handler immediately
-    if (image.complete) {
+    if (image.complete && image.src) {
       handleImageLoad();
     } else {
       // Otherwise, add the event listener
