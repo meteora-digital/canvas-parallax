@@ -89,8 +89,8 @@ export default class CanvasParallaxController {
     // Set the loaded status to false
     this.status.loaded = false;
 
-    // When the image loads, we need to add a new ParallaxImageController
-    image.addEventListener('load', () => {
+    // Function to handle image load
+    const handleImageLoad = () => {
       // Tell the status that something is loaded
       this.status.loaded = true;
       // Add this layer to the layers object
@@ -111,7 +111,15 @@ export default class CanvasParallaxController {
           this.canvas.element.classList.add('carallax--loaded');
         }
       }, 100);
-    });
+    };
+
+    // If the image is already loaded, call the handler immediately
+    if (image.complete) {
+      handleImageLoad();
+    } else {
+      // Otherwise, add the event listener
+      image.addEventListener('load', handleImageLoad);
+    }
 
     // if the src is an element
     if (src instanceof Element) {
