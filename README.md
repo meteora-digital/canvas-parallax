@@ -56,6 +56,7 @@ CanvasParallax.load(image.src, "50% 50%");
 | `depth` | `number` | The depth of the parallax effect. | `50` |
 | `preload ` | `boolean` | Whether or not the class will pre-calculate all the positions of the parallax | `true` |
 | `throttle` | `number` | The resize calculations throttle time in milliseconds. | `100` |
+| `precision` | `number` | The precision of the parallax effect. (I'd suggest keeping this as low as possible, without seeing a stuttering parallax) | `5` |
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)

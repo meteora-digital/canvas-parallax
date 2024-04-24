@@ -17,6 +17,7 @@ export default class CanvasParallaxController {
       depth: 50,
       preload: true,
       throttle: 100,
+      precision: 5
     }
 
     // Object assign the user settings
@@ -148,7 +149,7 @@ export default class CanvasParallaxController {
 
   calculateScrollPercent(offset = 0) {
     const distance = (offset + window.innerHeight) - (this.canvas.pageYOffset);
-    const decimalPlaces = 2;
+    const decimalPlaces = this.settings.precision;
     const alignment = (decimalPlaces * .5);
 
 
