@@ -36,6 +36,9 @@ export default class CanvasParallaxController {
     // A store for all our already solved calculations
     this.calculations = {};
 
+    // Store the events here
+    this.events = {};
+
     // We will store some values here
     this.cache = {
       // ScrollY will be used to store the last scroll position, we can use it to check if we have scrolled
@@ -272,6 +275,20 @@ export default class CanvasParallaxController {
       this.calculations = {};
       this.getScrollPercentages();
     }, this.settings.throttle);
+  }
+
+  callback(type, data = false) {
+    // run the callback functions
+    if (this.events[type]) this.events[type].forEach((event) => event(data));
+  }
+
+  on(event, func) {
+    // If we loaded an event and it's not the on event and we also loaded a function
+    if (event && event != 'on' && event != 'callback' && this[event] && func && typeof func == 'function') {
+      if (this.events[event] == undefined) this.events[event] = [];
+      // Push a new event to the event array
+      this.events[event].push(func);
+    }
   }
 }
 
