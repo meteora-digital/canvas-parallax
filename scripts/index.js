@@ -226,6 +226,9 @@ export default class CanvasParallaxController {
 
       try {
         this.canvas.ctx.drawImage(this.buffer.element, 0, 0);
+
+        // Fire the callback functions
+        this.callback('draw');
       } catch (e) { }
     }
   }
@@ -274,6 +277,9 @@ export default class CanvasParallaxController {
       // Clear all the calculations
       this.calculations = {};
       this.getScrollPercentages();
+
+      // Fire the callback functions
+      this.callback('resize');
     }, this.settings.throttle);
   }
 

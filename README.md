@@ -58,5 +58,17 @@ CanvasParallax.load(image.src, "50% 50%");
 | `throttle` | `number` | The resize calculations throttle time in milliseconds. | `100` |
 | `precision` | `number` | The precision of the parallax effect. (I'd suggest keeping this as low as possible, without seeing a stuttering parallax) | `5` |
 
+## Callbacks
+
+```es6
+CanvasParallax.on('draw', () => {
+    // Do something
+});
+
+CanvasParallax.on('resize', () => {
+    // Do something
+});
+```
+
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
