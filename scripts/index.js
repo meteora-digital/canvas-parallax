@@ -354,7 +354,7 @@ class ParallaxImageController {
     this.calculations = {};
 
     // Adjust the target height to be at least the height argument plus the depth
-    height = Math.max(height, this.depth + height);
+    height = Math.max(height, Math.abs(this.depth) + height);
 
     // Calculate the aspect ratios
     let imageAspectRatio = this.image.naturalWidth / this.image.naturalHeight;
