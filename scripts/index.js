@@ -112,9 +112,9 @@ export default class CanvasParallaxController {
       clearTimeout(this.timeouts['loaded']);
       this.timeouts['loaded'] = setTimeout(() => {
         // if the canvas.element does not have loaded class
-        if (!this.canvas.element.classList.contains('carallax--loaded')) {
+        if (!this.canvas.element.classList.contains('loaded')) {
           // Add the loaded class to the canvas.element
-          this.canvas.element.classList.add('carallax--loaded');
+          this.canvas.element.classList.add('loaded');
         }
       }, 100);
     };
@@ -353,10 +353,16 @@ class ParallaxImageController {
         y: this.height - viewport.height,
       }
 
+      // Calculate the maximum possible focal point that will not expose the edge of the image
+      let maxFocusY = (this.height - viewport.height) / (2 * overflow.y);
+
+      // If the user-defined focus point is greater than the maximum, use the maximum
+      let focusY = Math.min(this.focus.y, maxFocusY);
+
       // Using the overflow and the focus, calculate the position of the image
       let position = {
         x: center.x + (overflow.x * (0.5 - this.focus.x)),
-        y: center.y + (overflow.y * (0.5 - this.focus.y)),
+        y: center.y + (overflow.y * (0.5 - focusY)),
       }
 
       let offset = (this.depth / 2) * (percentage);
