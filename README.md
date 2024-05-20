@@ -2,6 +2,10 @@
 
 This class will create a canvas element to draw a parallax background image
 
+## Latest Release Notes
+
+The depth parameter has been refined. Initially, it was defined in pixel units. However, to enhance responsiveness and adaptability across different devices, it has been changed to a percentage-based value. After updating, you may need to adjust the depth value to correct the parallax effect.
+
 ## Example
 
 [Canvas Parallax Example on CodePen](https://codepen.io/meteora-digital/full/abMePNr)
