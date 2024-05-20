@@ -439,3 +439,37 @@ class ParallaxImageController {
     return this.calculations[percentage];
   }
 }
+
+/* ██████╗ █████╗ ███╗   ██╗██╗   ██╗ █████╗ ███████╗
+  ██╔════╝██╔══██╗████╗  ██║██║   ██║██╔══██╗██╔════╝
+  ██║     ███████║██╔██╗ ██║██║   ██║███████║███████╗
+  ██║     ██╔══██║██║╚██╗██║╚██╗ ██╔╝██╔══██║╚════██║
+  ╚██████╗██║  ██║██║ ╚████║ ╚████╔╝ ██║  ██║███████║
+   ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝  ╚═══╝  ╚═╝  ╚═╝╚══════╝ */
+
+class CanvasController {
+  constructor() {
+    // Create a new canvasController element
+    this.element = document.createElement('canvas');
+    // The canvas context
+    this.ctx = this.element.getContext('2d');
+    // The page offset
+    this.pageYOffset = 0;
+  }
+
+  // Resize the buffer canvas
+  resize(width = 1, height = 1) {
+    let offset = 0;
+    let element = this.element;
+
+    while (element) {
+      offset += element.offsetTop;
+      element = element.offsetParent;
+    }
+
+    this.element.width = width;
+    this.element.height = height;
+    // Update the pageYOffset of the canvas
+    this.pageYOffset = offset;
+  }
+}
