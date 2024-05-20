@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------
-Carallax
+Canvas Parallax
 ------------------------------------------------------------------*/
 
 /* ██████╗  █████╗ ██████╗  █████╗ ██╗     ██╗      █████╗ ██╗  ██╗
@@ -214,12 +214,14 @@ export default class CanvasParallaxController {
         this.canvas.ctx.clearRect(0, 0, this.canvas.element.width, this.canvas.element.height);
       }
 
+      console.log('image-width: ', this.image.canvas.element.width);
       // Draw the image to the buffer canvas;
       try {
         let position = this.image.parallax(percentScrolled, {
           width: this.canvas.element.clientWidth,
           height: this.canvas.element.clientHeight,
         });
+
 
         this.buffer.ctx.drawImage(this.image.canvas.element, position.x, position.y);
       } catch (e) { }
@@ -334,9 +336,52 @@ class ParallaxImageController {
     };
   }
 
+  resize(vw, vh) {
+    // Reset the calculations
+    this.calculations = {};
+
+    // Get the aspect ratio of the image
+    const imgAspectRatio = this.image.naturalWidth / this.image.naturalHeight;
+
+    // Calculate the dimensions of the canvas based on the larger of the viewport width and the viewport height times the image's aspect ratio
+    let canvasWidth = Math.max(vw, vh * imgAspectRatio);
+    let canvasHeight = canvasWidth / imgAspectRatio;
+
+    // Calculate the extra height required by the depth
+    let extraHeight = vh * this.depth / 100;
+
+    // If the image's natural height isn't enough to cover the extra height, add the extra height to the canvas height
+    if (this.image.naturalHeight < vh + extraHeight) {
+      canvasHeight += extraHeight;
+    }
+
+    // Set the width and height of the layer
+    this.canvas.resize(canvasWidth, canvasHeight);
+
+    this.width = this.canvas.element.width;
+    this.height = this.canvas.element.height;
+
+    // After we have resized the image, we want to update the canvas
+    this.draw();
+  }
+
   draw() {
-    // Draw the image on the canvas at the appropriate size
-    this.canvas.ctx.drawImage(this.image, 0, 0, this.canvas.element.width, this.canvas.element.height);
+    // Calculate the scale factor to cover the canvas while maintaining the image's aspect ratio
+    const scale = Math.max(
+      this.canvas.element.width / this.image.naturalWidth,
+      this.canvas.element.height / this.image.naturalHeight
+    );
+
+    // Calculate the size to draw the image at
+    const drawWidth = this.image.naturalWidth * scale;
+    const drawHeight = this.image.naturalHeight * scale;
+
+    // Calculate the position to draw the image at so it's centered on the canvas
+    const x = (this.canvas.element.width - drawWidth) / 2;
+    const y = (this.canvas.element.height - drawHeight) / 2;
+
+    // Draw the image on the canvas at the calculated size and position
+    this.canvas.ctx.drawImage(this.image, x, y, drawWidth, drawHeight);
   }
 
   parallax(percentage = 0, viewport = {}) {
@@ -359,13 +404,29 @@ class ParallaxImageController {
       // If the user-defined focus point is greater than the maximum, use the maximum
       let focusY = Math.min(this.focus.y, maxFocusY);
 
+      // Calculate the extra height required by the depth
+      let extraHeight = viewport.height * (this.depth / 100);
+
+      // Calculate a dynamic focal point based on the image height, viewport height, and depth
+      let dynamicFocusY = (this.height - extraHeight) / (2 * viewport.height);
+
+      // Use the larger of the user-defined focal point and the dynamic focal point
+      focusY = Math.max(focusY, dynamicFocusY);
+
+      // Calculate the offset as a percentage of the viewport height
+      let offset = extraHeight * percentage;
+
+      // Calculate the maximum possible x focal point that will not expose the edge of the image
+      let maxFocusX = overflow.x !== 0 ? (this.width - viewport.width) / (2 * overflow.x) : this.focus.x;
+
+      // If the user-defined x focus point is greater than the maximum, use the maximum
+      let focusX = Math.min(this.focus.x, maxFocusX);
+
       // Using the overflow and the focus, calculate the position of the image
       let position = {
-        x: center.x + (overflow.x * (0.5 - this.focus.x)),
+        x: center.x + (overflow.x * (0.5 - focusX)),
         y: center.y + (overflow.y * (0.5 - focusY)),
       }
-
-      let offset = (this.depth / 2) * (percentage);
 
       // Add the offset to the y position
       position.y += offset;
@@ -376,77 +437,5 @@ class ParallaxImageController {
 
     // Return the calculation
     return this.calculations[percentage];
-  }
-
-  resize(width, height) {
-    // Reset the calculations
-    this.calculations = {};
-
-    // Adjust the target height to be at least the height argument plus the depth
-    height = Math.max(height, Math.abs(this.depth) + height);
-
-    // Calculate the aspect ratios
-    let imageAspectRatio = this.image.naturalWidth / this.image.naturalHeight;
-    let targetAspectRatio = width / height;
-
-    let canvasWidth, canvasHeight;
-
-    // If the image aspect ratio is less than the target aspect ratio,
-    // set the width to the target width and scale the height to maintain the aspect ratio
-    if (imageAspectRatio < targetAspectRatio) {
-      canvasWidth = width;
-      canvasHeight = Math.round(width / imageAspectRatio);
-    }
-    // If the image aspect ratio is greater than the target aspect ratio,
-    // set the height to the target height and scale the width to maintain the aspect ratio
-    else {
-      canvasHeight = height;
-      canvasWidth = Math.round(height * imageAspectRatio);
-    }
-
-    // Resize the canvas
-    this.canvas.resize(canvasWidth, canvasHeight);
-
-    // Work out the pixel height of the layer
-    this.height = this.canvas.element.height;
-    // Work out the pixel width of the layer
-    this.width = this.canvas.element.width;
-
-    // After we have resized the image, we want to update the canvas
-    this.draw();
-  }
-}
-
-/* ██████╗ █████╗ ███╗   ██╗██╗   ██╗ █████╗ ███████╗
-  ██╔════╝██╔══██╗████╗  ██║██║   ██║██╔══██╗██╔════╝
-  ██║     ███████║██╔██╗ ██║██║   ██║███████║███████╗
-  ██║     ██╔══██║██║╚██╗██║╚██╗ ██╔╝██╔══██║╚════██║
-  ╚██████╗██║  ██║██║ ╚████║ ╚████╔╝ ██║  ██║███████║
-   ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝  ╚═══╝  ╚═╝  ╚═╝╚══════╝ */
-
-class CanvasController {
-  constructor() {
-    // Create a new canvasController element
-    this.element = document.createElement('canvas');
-    // The canvas context
-    this.ctx = this.element.getContext('2d');
-    // The page offset
-    this.pageYOffset = 0;
-  }
-
-  // Resize the buffer canvas
-  resize(width = 1, height = 1) {
-    let offset = 0;
-    let element = this.element;
-
-    while (element) {
-      offset += element.offsetTop;
-      element = element.offsetParent;
-    }
-
-    this.element.width = width;
-    this.element.height = height;
-    // Update the pageYOffset of the canvas
-    this.pageYOffset = offset;
   }
 }
