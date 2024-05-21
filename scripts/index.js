@@ -52,16 +52,10 @@ export default class CanvasParallaxController {
       this.resize();
     });
 
-    // An intersection observer
-    this.IntersectionObserver = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) this.resize();
-      });
-    });
-
     // Observe the canvas element
     this.ResizeObserver.observe(this.canvas.element);
-    this.IntersectionObserver.observe(this.canvas.element);
+    // Also observe the body element in case content has been added to the page
+    this.ResizeObserver.observe(document.body);
 
     // Keep track of everything going on
     this.status = {
