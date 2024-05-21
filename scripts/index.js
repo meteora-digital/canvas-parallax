@@ -214,7 +214,6 @@ export default class CanvasParallaxController {
         this.canvas.ctx.clearRect(0, 0, this.canvas.element.width, this.canvas.element.height);
       }
 
-      console.log('image-width: ', this.image.canvas.element.width);
       // Draw the image to the buffer canvas;
       try {
         let position = this.image.parallax(percentScrolled, {
@@ -340,23 +339,11 @@ class ParallaxImageController {
     // Reset the calculations
     this.calculations = {};
 
-    // Get the aspect ratio of the image
-    const imgAspectRatio = this.image.naturalWidth / this.image.naturalHeight;
-
-    // Calculate the dimensions of the canvas based on the larger of the viewport width and the viewport height times the image's aspect ratio
-    let canvasWidth = Math.max(vw, vh * imgAspectRatio);
-    let canvasHeight = canvasWidth / imgAspectRatio;
-
     // Calculate the extra height required by the depth
-    let extraHeight = vh * this.depth / 100;
-
-    // If the image's natural height isn't enough to cover the extra height, add the extra height to the canvas height
-    if (this.image.naturalHeight < vh + extraHeight) {
-      canvasHeight += extraHeight;
-    }
+    let extraHeight = vh * ((this.depth * 2) / 100);
 
     // Set the width and height of the layer
-    this.canvas.resize(canvasWidth, canvasHeight);
+    this.canvas.resize(vw, vh + extraHeight);
 
     this.width = this.canvas.element.width;
     this.height = this.canvas.element.height;
@@ -366,22 +353,27 @@ class ParallaxImageController {
   }
 
   draw() {
-    // Calculate the scale factor to cover the canvas while maintaining the image's aspect ratio
-    const scale = Math.max(
-      this.canvas.element.width / this.image.naturalWidth,
-      this.canvas.element.height / this.image.naturalHeight
-    );
+    let canvasAspectRatio = this.width / this.height;
+    let imageAspectRatio = this.image.naturalWidth / this.image.naturalHeight;
 
-    // Calculate the size to draw the image at
-    const drawWidth = this.image.naturalWidth * scale;
-    const drawHeight = this.image.naturalHeight * scale;
+    let imageWidth, imageHeight;
 
-    // Calculate the position to draw the image at so it's centered on the canvas
-    const x = (this.canvas.element.width - drawWidth) / 2;
-    const y = (this.canvas.element.height - drawHeight) / 2;
+    if (imageAspectRatio > canvasAspectRatio) {
+      // Image aspect ratio is greater, scale by height
+      imageWidth = this.image.naturalWidth * (this.height / this.image.naturalHeight);
+      imageHeight = this.height;
+    } else {
+      // Canvas aspect ratio is greater/equal, scale by width
+      imageWidth = this.width;
+      imageHeight = this.image.naturalHeight * (this.width / this.image.naturalWidth);
+    }
 
-    // Draw the image on the canvas at the calculated size and position
-    this.canvas.ctx.drawImage(this.image, x, y, drawWidth, drawHeight);
+    // Calculate the x and y offsets
+    let xOffset = (this.width - imageWidth) * this.focus.x;
+    let yOffset = (this.height - imageHeight) * this.focus.y;
+
+    // Draw the image at the calculated x and y offsets
+    this.canvas.ctx.drawImage(this.image, xOffset, yOffset, imageWidth, imageHeight);
   }
 
   parallax(percentage = 0, viewport = {}) {
@@ -392,44 +384,17 @@ class ParallaxImageController {
         y: (viewport.height - this.height) / 2,
       };
 
-      // get the overflow values for the image in the viewport
-      let overflow = {
-        x: this.width - viewport.width,
-        y: this.height - viewport.height,
-      }
-
-      // Calculate the maximum possible focal point that will not expose the edge of the image
-      let maxFocusY = (this.height - viewport.height) / (2 * overflow.y);
-
-      // If the user-defined focus point is greater than the maximum, use the maximum
-      let focusY = Math.min(this.focus.y, maxFocusY);
-
       // Calculate the extra height required by the depth
       let extraHeight = viewport.height * (this.depth / 100);
-
-      // Calculate a dynamic focal point based on the image height, viewport height, and depth
-      let dynamicFocusY = (this.height - extraHeight) / (2 * viewport.height);
-
-      // Use the larger of the user-defined focal point and the dynamic focal point
-      focusY = Math.max(focusY, dynamicFocusY);
 
       // Calculate the offset as a percentage of the viewport height
       let offset = extraHeight * percentage;
 
-      // Calculate the maximum possible x focal point that will not expose the edge of the image
-      let maxFocusX = overflow.x !== 0 ? (this.width - viewport.width) / (2 * overflow.x) : this.focus.x;
-
-      // If the user-defined x focus point is greater than the maximum, use the maximum
-      let focusX = Math.min(this.focus.x, maxFocusX);
-
-      // Using the overflow and the focus, calculate the position of the image
+      // The position of the image is always centered in the viewport
       let position = {
-        x: center.x + (overflow.x * (0.5 - focusX)),
-        y: center.y + (overflow.y * (0.5 - focusY)),
+        x: center.x,
+        y: center.y + offset, // Add the offset to the y position
       }
-
-      // Add the offset to the y position
-      position.y += offset;
 
       // Store the calculation
       this.calculations[percentage] = position;
