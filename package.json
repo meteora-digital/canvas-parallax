@@ -31,5 +31,8 @@
     "webpack-cli": "^5.1.4",
     "worker-loader": "^3.0.8"
   },
-  "homepage": "https://github.com/meteora-digital/canvas-parallax#readme"
+  "homepage": "https://github.com/meteora-digital/canvas-parallax#readme",
+  "dependencies": {
+    "core-js": "^3.37.1"
+  }
 }

@@ -72,6 +72,35 @@ export default class CanvasParallaxController {
     // Tell the canvas to begin drawing immediately
     this.enable();
     this.start();
+
+    // Define the worker for calculateScrollPercent
+    this.scrollPercentageCalculator = new Worker(URL.createObjectURL(new Blob([`
+      self.onmessage = function(e) {
+        const { offset, decimalPlaces, canvasPageYOffset, windowHeight, canvasHeight } = e.data;
+        const distance = (offset + windowHeight) - canvasPageYOffset;
+        const alignment = (decimalPlaces * .5);
+        const calculation = distance / ((windowHeight + canvasHeight) / decimalPlaces);
+        const decimal = ((calculation - alignment) * 2) / decimalPlaces;
+        const result = decimal.toFixed(decimalPlaces);
+        self.postMessage(result);
+      };
+    `], { type: 'application/javascript' })));
+
+    // Define the worker for getScrollPercentages
+    this.scrollPercentageGetter = new Worker(URL.createObjectURL(new Blob([`
+      self.onmessage = function(e) {
+        const { from, to, windowHeight, canvasHeight, decimalPlaces, canvasPageYOffset } = e.data;
+        const calculations = {};
+        for (let index = from; index < to; index++) {
+          const distance = (index + windowHeight) - canvasPageYOffset;
+          const alignment = (decimalPlaces * .5);
+          const calculation = distance / ((windowHeight + canvasHeight) / decimalPlaces);
+          const decimal = ((calculation - alignment) * 2) / decimalPlaces;
+          calculations[index] = decimal.toFixed(decimalPlaces);
+        }
+        self.postMessage(calculations);
+      };
+    `], { type: 'application/javascript' })));
   }
 
   enable() {
@@ -144,39 +173,51 @@ export default class CanvasParallaxController {
     }
   }
 
+  // Modify calculateScrollPercent to use the worker
   calculateScrollPercent(offset = 0) {
-    const distance = (offset + window.innerHeight) - (this.canvas.pageYOffset);
-    const decimalPlaces = this.settings.precision;
-    const alignment = (decimalPlaces * .5);
-
-
-    const calculation = distance / ((window.innerHeight + this.canvas.element.clientHeight) / decimalPlaces);
-    const decimal = ((calculation - alignment) * 2) / decimalPlaces;
-    const result = decimal;
-
-    return result.toFixed(decimalPlaces);
+    return new Promise((resolve) => {
+      this.scrollPercentageCalculator.onmessage = (e) => {
+        resolve(e.data);
+      };
+      this.scrollPercentageCalculator.postMessage({
+        offset: offset,
+        decimalPlaces: this.settings.precision,
+        canvasPageYOffset: this.canvas.pageYOffset,
+        windowHeight: window.innerHeight,
+        canvasHeight: this.canvas.element.clientHeight
+      });
+    });
   }
 
-  getScrollPercentages() {
-    this.calculations = {};
-
+  // Modify getScrollPercentages to use the worker
+  async getScrollPercentages() {
     if (this.status.initialized || this.settings.preload) {
       const from = this.canvas.pageYOffset - window.innerHeight;
       const to = from + this.canvas.element.clientHeight + window.innerHeight;
 
-      for (let index = from; index < to; index++) {
-        this.calculations[index] = this.calculateScrollPercent(index);
+      this.scrollPercentageGetter.onmessage = (e) => {
+        this.calculations = e.data;
+        this.status.initialized = true;
 
         // Make sure the image is loaded
         if (this.image) {
-          this.image.parallax(this.calculations[index], {
-            width: this.canvas.element.clientWidth,
-            height: this.canvas.element.clientHeight,
-          });
+          Object.values(this.calculations).forEach(calculation =>
+            this.image.parallax(calculation, {
+              width: this.canvas.element.clientWidth,
+              height: this.canvas.element.clientHeight,
+            })
+          );
         }
-      }
+      };
 
-      this.status.initialized = true;
+      this.scrollPercentageGetter.postMessage({
+        from: from,
+        to: to,
+        windowHeight: window.innerHeight,
+        canvasHeight: this.canvas.element.clientHeight,
+        decimalPlaces: this.settings.precision,
+        canvasPageYOffset: this.canvas.pageYOffset
+      });
     }
   }
 
