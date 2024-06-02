@@ -381,8 +381,11 @@ class ParallaxImageController {
     // Reset the calculations
     this.calculations = {};
 
+    // Calculate the absolute depth
+    let depth = Math.abs(this.depth);
+
     // Calculate the extra height required by the depth
-    let extraHeight = vh * ((this.depth * 2) / 100);
+    let extraHeight = vh * ((depth * 2) / 100);
 
     // Set the width and height of the layer
     this.canvas.resize(vw, vh + extraHeight);
