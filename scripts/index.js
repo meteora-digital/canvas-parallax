@@ -12,18 +12,13 @@ Canvas Parallax
 export default class CanvasParallaxController {
   constructor(options = {}) {
     // The parallax settings
-    this.settings = {
+    this.settings = Object.assign({
       alpha: false,
       depth: 50,
       preload: true,
       throttle: 100,
       precision: 5
-    }
-
-    // Object assign the user settings
-    for (const key in this.settings) {
-      if (Object.hasOwnProperty.call(this.settings, key) && options[key]) this.settings[key] = options[key];
-    }
+    }, options);
 
     // Create a new buffer canvas
     this.canvas = new CanvasController();
