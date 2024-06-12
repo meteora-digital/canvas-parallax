@@ -341,7 +341,7 @@ class ParallaxImageController {
     // The actual image element
     this.image = image;
     // The visual depth of the layer
-    this.depth = settings.depth || 50;
+    this.depth = settings.depth;
     // The focus position of the image
     this.focus = settings.focus || '50% 50%';
     // Create a new buffer canvas
