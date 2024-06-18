@@ -186,7 +186,7 @@ export default class CanvasParallaxController {
   async getScrollPercentages() {
     return new Promise((resolve) => {
       if (this.status.initialized || this.settings.preload) {
-        const from = this.canvas.pageYOffset - window.innerHeight;
+        const from = Math.max(0, this.canvas.pageYOffset - window.innerHeight);
         const to = from + this.canvas.element.clientHeight + window.innerHeight;
 
         this.scrollPercentageGetter.onmessage = (e) => {
