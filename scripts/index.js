@@ -274,7 +274,6 @@ export default class CanvasParallaxController {
 
       if (this.cache.scrollY != window.scrollY) {
         this.cache.scrollY = window.scrollY;
-        console.log('update');
         this.draw();
       }
     });
