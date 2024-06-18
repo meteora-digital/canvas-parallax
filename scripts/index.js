@@ -274,6 +274,7 @@ export default class CanvasParallaxController {
 
       if (this.cache.scrollY != window.scrollY) {
         this.cache.scrollY = window.scrollY;
+        console.log('update');
         this.draw();
       }
     });
@@ -411,6 +412,9 @@ class ParallaxImageController {
     // Calculate the x and y offsets
     let xOffset = (this.width - imageWidth) * this.focus.x;
     let yOffset = (this.height - imageHeight) * this.focus.y;
+
+    // Adjust the y offset based on the depth
+    yOffset = yOffset + (imageHeight * (this.depth / 100) / 4);
 
     // Draw the image at the calculated x and y offsets
     this.canvas.ctx.drawImage(this.image, xOffset, yOffset, imageWidth, imageHeight);
