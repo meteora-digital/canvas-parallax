@@ -413,7 +413,7 @@ class ParallaxImageController {
     let yOffset = (this.height - imageHeight) * this.focus.y;
 
     // Adjust the y offset based on the depth
-    yOffset = yOffset + (imageHeight * (this.depth / 100) / 4);
+    yOffset = yOffset + (imageHeight * (this.depth / 100) / 10);
 
     // Draw the image at the calculated x and y offsets
     this.canvas.ctx.drawImage(this.image, xOffset, yOffset, imageWidth, imageHeight);
